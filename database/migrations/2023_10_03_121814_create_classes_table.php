@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('libelle',100);
             $table->string('numero',10);
             $table->integer('effectif');
-            $table->foreignIdFor(App\Models\Level::class)->constrained();
+            $table->foreignIdFor(App\Models\Level::class)->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }

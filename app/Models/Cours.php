@@ -8,4 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class Cours extends Model
 {
     use HasFactory;
+    public $guarded=[''];
+
+    public function cours(){
+        return $this->belongsToMany(Classe::class,'cours_classes')
+            ->withPivot('heure_globale');
+    }
 }

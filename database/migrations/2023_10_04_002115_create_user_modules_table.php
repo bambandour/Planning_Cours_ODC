@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('classe_sessions', function (Blueprint $table) {
+        Schema::create('user_modules', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(App\Models\Session::class)->constrained()->cascadeOnDelete();
-            $table->foreignIdFor(App\Models\CoursClasse::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(App\Models\Module::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(App\Models\User::class)->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('classe_sessions');
+        Schema::dropIfExists('user_modules');
     }
 };

@@ -13,9 +13,10 @@ return new class extends Migration
     {
         Schema::create('cours_classes', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(App\Models\Cours::class)->constrained();
-            $table->foreignIdFor(App\Models\Classe::class)->constrained();
-            $table->foreignIdFor(App\Models\Module::class)->constrained();
+            $table->integer('heure_globale');
+            $table->foreignIdFor(App\Models\Cours::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(App\Models\Classe::class)->constrained()->cascadeOnDelete();
+            // $table->foreignIdFor(App\Models\Module::class)->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }
