@@ -14,6 +14,14 @@ class CoursResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            "id"=>$this->id,
+            "annee_semestre"=>AnneeSemestreResource::make($this->annee_semestre),
+            "annee_classe"=>AnneeClasseResource::make($this->annee_classe),
+            "prof_module"=>UserModuleResource::make($this->user_module),
+            "heure_globale"=>$this->heure_globale,
+            "etat"=>$this->etat,
+            // "classes"=>ClasseResource::collection($this->annee_classes),
+        ];
     }
 }

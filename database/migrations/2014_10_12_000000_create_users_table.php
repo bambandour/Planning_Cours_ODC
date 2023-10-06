@@ -20,6 +20,7 @@ return new class extends Migration
             $table->enum('grade',['docteur','professeur','maitre'])->nullable();
             $table->string('email')->unique();
             $table->string('password');
+            $table->string('role',100);
             $table->timestamps();
         });
     }

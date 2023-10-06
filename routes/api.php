@@ -17,9 +17,15 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::get('/users',[UserController::class,'index'])->name('index.user');
+
 Route::post('/user',[UserController::class,'store'])->name('store.user');
 
 Route::post('/cours',[CoursController::class,'store'])->name('store.cours');
+
+Route::get('/cours',[CoursController::class,'index'])->name('index.cours');
+
+Route::get('/modules',[CoursController::class,'allModuleWithProf'])->name('allModuleWithProf');
 
 Route::post('/session',[SessionController::class,'store'])->name('store.session');
 

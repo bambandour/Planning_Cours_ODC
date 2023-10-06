@@ -8,4 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class UserModule extends Model
 {
     use HasFactory;
+
+    public function module(){
+        return $this->belongsTo(Module::class);
+    }
+    public function user(){
+        return $this->belongsTo(User::class);
+    }
 }

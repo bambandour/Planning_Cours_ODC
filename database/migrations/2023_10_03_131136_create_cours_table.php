@@ -1,6 +1,8 @@
 <?php
 
+use App\Models\AnneeClasse;
 use App\Models\AnneeScolaire;
+use App\Models\AnneeSemestre;
 use App\Models\Semestre;
 use App\Models\UserModule;
 use Illuminate\Database\Migrations\Migration;
@@ -16,9 +18,9 @@ return new class extends Migration
     {
         Schema::create('cours', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(AnneeScolaire::class)->constrained()->cascadeOnDelete();
-            // $table->foreignId('users_modules_id')->constrained('user_modules')->cascadeOnDelete();
-            $table->foreignIdFor(Semestre::class)->constrained()->cascadeOnDelete();
+            $table->integer('heure_globale');
+            $table->foreignIdFor(AnneeSemestre::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(AnneeClasse::class)->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }

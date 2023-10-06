@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Salle;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -17,9 +18,10 @@ return new class extends Migration
             $table->integer('h_debut');
             $table->integer('h_fin');
             $table->integer('nombre_heure');
-            $table->enum('type_session',['presentiel','online'])->default('presentiel');
+            $table->enum('type',['presentiel','online'])->default('presentiel');
             $table->enum('validated',['accept','refus','pending'])->nullable();
-            $table->foreignIdFor(App\Models\Semestre::class)->constrained();
+            $table->boolean('etat')->default(false);
+            $table->foreignIdFor(Salle::class)->constrained()->nullable()->cascadeOnDelete();
             $table->timestamps();
         });
     }
