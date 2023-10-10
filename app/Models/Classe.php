@@ -15,7 +15,7 @@ class Classe extends Model
     }
 
     public function classes(){
-        return $this->belongsToMany(Cours::class,'cours_classes')
-            ->withPivot('heure_globale','id');
+        return $this->belongsToMany(AnneeScolaire::class,'annee_classes')
+            ->withPivot('id');
     }
 }

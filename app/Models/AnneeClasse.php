@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class AnneeClasse extends Model
 {
     use HasFactory;
+    public $guarded=[''];
 
     public function annee_scolaire(){
         return $this->belongsTo(AnneeScolaire::class);

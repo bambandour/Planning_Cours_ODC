@@ -8,11 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class AnneeSemestre extends Model
 {
     use HasFactory;
-
+    public $guarded=[''];
     public function annee_scolaire(){
         return $this->belongsTo(AnneeScolaire::class);
     }
-
     public function semestre(){
         return $this->belongsTo(Semestre::class);
     }

@@ -29,6 +29,8 @@ Route::get('/modules',[CoursController::class,'allModuleWithProf'])->name('allMo
 
 Route::post('/session',[SessionController::class,'store'])->name('store.session');
 
+Route::get('/session',[SessionController::class,'index'])->name('index.session');
+
 
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //     return $request->user();

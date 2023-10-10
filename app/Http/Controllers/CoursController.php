@@ -24,7 +24,6 @@ class CoursController extends Controller
         $cours=Cours::all();
         $data=CoursResource::collection($cours);
         return $this->formatResponse('La liste des cours planifiés  !',$data, true, Response::HTTP_OK);
-
         // return $cours;
     }
 

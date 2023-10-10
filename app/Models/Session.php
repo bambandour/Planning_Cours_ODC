@@ -10,7 +10,11 @@ class Session extends Model
     use HasFactory;
 
     public $guarded=['id'];
-    public function sessions(){
-        return $this->belongsToMany(CoursClasse::class,'classe_sessions');
+    public function cours(){
+        return $this->belongsTo(Cours::class);
+    }
+
+    public function salle(){
+        return $this->belongsTo(Salle::class);
     }
 }
