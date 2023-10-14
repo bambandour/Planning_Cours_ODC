@@ -15,4 +15,8 @@ class AnneeSemestre extends Model
     public function semestre(){
         return $this->belongsTo(Semestre::class);
     }
+    public function semestres(){
+        return $this->belongsToMany(AnneeScolaire::class,'annee_semestres')
+            ->withPivot('id');
+    }
 }

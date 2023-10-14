@@ -45,4 +45,22 @@ class User extends Authenticatable
         return $this->belongsToMany(Module::class,'user_modules','module_id','user_id')
             ->withPivot('id');
     }
+    public function users(){
+        return $this->belongsToMany(AnneeClasse::class,'inscriptions')
+            ->withPivot('id');
+    }
+    public function classes()
+    {
+        return $this->belongsToMany(Classe::class);
+    }
+
+    public function anneeClasses()
+    {
+        return $this->belongsToMany(AnneeClasse::class);
+    }
+
+    public function anneeSemestres()
+    {
+        return $this->belongsToMany(AnneeSemestre::class);
+    }
 }

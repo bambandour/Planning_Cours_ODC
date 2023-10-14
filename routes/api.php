@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CoursController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\UserController;
@@ -18,20 +19,26 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/users',[UserController::class,'index'])->name('index.user');
-
 Route::post('/user',[UserController::class,'store'])->name('store.user');
+Route::post('/import',[UserController::class,'import'])->name('import.user');
+
+Route::post('/login', [AuthController::class, 'login']);
+// Route::post('/logout', [AuthController::class, 'logout']);
+// Route::get('/user', [AuthController::class, 'user']);
 
 Route::post('/cours',[CoursController::class,'store'])->name('store.cours');
-
 Route::get('/cours',[CoursController::class,'index'])->name('index.cours');
-
 Route::get('/modules',[CoursController::class,'allModuleWithProf'])->name('allModuleWithProf');
 
 Route::post('/session',[SessionController::class,'store'])->name('store.session');
-
 Route::get('/session',[SessionController::class,'index'])->name('index.session');
 
 
+Route::middleware('auth:sanctum')->group(function () {
+
+    Route::get('/user', [AuthController::class, 'user']);
+    Route::post('/logout', [AuthController::class, 'logout']);
+});
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //     return $request->user();
 // });

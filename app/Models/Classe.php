@@ -18,4 +18,8 @@ class Classe extends Model
         return $this->belongsToMany(AnneeScolaire::class,'annee_classes')
             ->withPivot('id');
     }
+    public function users()
+    {
+        return $this->belongsToMany(User::class);
+    }
 }
