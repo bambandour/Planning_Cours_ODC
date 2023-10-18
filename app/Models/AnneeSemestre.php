@@ -19,4 +19,5 @@ class AnneeSemestre extends Model
         return $this->belongsToMany(AnneeScolaire::class,'annee_semestres')
             ->withPivot('id');
     }
+    
 }

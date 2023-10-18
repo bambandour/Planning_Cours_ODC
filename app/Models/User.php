@@ -51,7 +51,7 @@ class User extends Authenticatable
     }
     public function classes()
     {
-        return $this->belongsToMany(Classe::class);
+        return $this->belongsToMany(AnneeClasse::class,'inscriptions');
     }
 
     public function anneeClasses()

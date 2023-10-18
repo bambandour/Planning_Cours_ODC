@@ -10,6 +10,7 @@ use App\Models\AnneeSemestre;
 use App\Models\Cours;
 use App\Models\Module;
 use App\Models\Semestre;
+use App\Models\User;
 use App\Models\UserModule;
 use App\Traits\ResponseTrait;
 use Illuminate\Http\Request;
@@ -29,8 +30,9 @@ class CoursController extends Controller
 
     public function store(Request $request){
             $annee=AnneeSemestre::where('etat',1)->first();
+            $anneeSemestre=AnneeSemestre::where('annee_scolaire_id',$annee->id)->where('etat',1)->first();
             $cours=Cours::create([
-            "annee_semestre_id"=>$annee->id,
+            "annee_semestre_id"=>$anneeSemestre->id,
             "user_module_id"=>$request->user_module_id,
             "annee_classe_id"=>$request->classe,
             "heure_globale"=>$request->heure_globale
@@ -42,5 +44,12 @@ class CoursController extends Controller
     public function allModuleWithProf(){
         $module=Module::with('users')->get();
         return ModuleResource::collection($module);
+    }
+    public function getCoursByProf(Request $request,$profId){
+        $prof=User::where('id',$profId)->where('role','professeur')->first();
+        $userModule=UserModule::where('user_id',$prof->id)->first();
+        $cours=Cours::where('user_module_id',$userModule->id)->get();
+        $data=CoursResource::collection($cours);
+        return $this->formatResponse('La liste des cours de '.$prof->nom.' !',$data, false, Response::HTTP_OK);
     }
 }

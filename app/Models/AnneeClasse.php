@@ -17,7 +17,7 @@ class AnneeClasse extends Model
     public function classe(){
         return $this->belongsTo(Classe::class);
     }
-    public function classes(){
+    public function users(){
         return $this->belongsToMany(User::class,'inscriptions')
             ->withPivot('id');
     }

@@ -39,11 +39,8 @@ class UserController extends Controller
             'file' => 'required|mimes:xlsx,xls,ods',
         ]);
         $file = $request->file('file');
-        // dd($file['classe']);
         Excel::import(new UsersImport, $file);
-        // return response("L'inscription a été faite avec succes !!!",200,$file);
-
-
-        
+        return response("L'inscription a été faite avec succes !!!",200,$file);
     }
+    
 }
