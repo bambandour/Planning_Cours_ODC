@@ -16,7 +16,10 @@ class AnneeClasseResource extends JsonResource
     {
         return [
             "id"=>$this->id,
-            "classe"=>ClasseResource::make($this->classe)
+            "classe"=>ClasseResource::make($this->classe),
+            "eleves"=>UserResource::collection($this->users),
+            "effectif"=>$this->effectif,
+
         ];
     }
 }

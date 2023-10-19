@@ -10,6 +10,7 @@ use App\Models\AnneeScolaire;
 use App\Models\AnneeSemestre;
 use App\Models\Classe;
 use App\Models\Cours;
+use App\Models\Demande;
 use App\Models\Module;
 use App\Models\Salle;
 use App\Models\Semestre;
@@ -173,7 +174,7 @@ class SessionController extends Controller
     }
 
     public function cancelSession($session_id){
-        $session = Session::find($session_id);
+        $session = Session::where('etat',0)->find($session_id);
         if (!$session) {
             return $this->formatResponse('La session de cours n\'existe pas.', null, true, 404);
         }
@@ -182,9 +183,9 @@ class SessionController extends Controller
         if ($currentDate >= $sessionDate) {
             return $this->formatResponse('Vous ne pouvez pas annuler une session après la date et l\'heure de début prévues.', null, true, 400);
         }
-        $cours = Cours::find($session->cours_id);
-        $cours->heure_restant += $session->nombre_heure;
-        $cours->save();
+        $demande=Demande::where('session_id',$session->id)->first();
+        $demande->statut="valider";
+        $demande->save();
         $session->delete();
         return $this->formatResponse('La session de cours a été annulée avec succès.', null, false, 200);
     }
@@ -207,7 +208,6 @@ class SessionController extends Controller
             return $this->formatResponse('Vous ne pouvez pas valider une session avant qu\'elle ne soit terminée.', null, true, 400);
         }
     }
-    
     public function invalidateSession($session_id) {
         $session = Session::find($session_id);
         if (!$session) {
@@ -217,7 +217,8 @@ class SessionController extends Controller
         $session->save();
         return $this->formatResponse('La session de cours a été invalidée avec succès.', null, false, 200);
     }
-    
-    
-    
+    public function sessionCanceledRequest(){
+
+    }
+
 }

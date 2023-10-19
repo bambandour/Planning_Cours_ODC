@@ -16,10 +16,14 @@ class Classe extends Model
 
     public function classes(){
         return $this->belongsToMany(AnneeScolaire::class,'annee_classes')
-            ->withPivot('id');
+            ->withPivot('id','effectif');
     }
+
+
     public function users()
     {
-        return $this->belongsToMany(User::class);
+        return $this->belongsToMany(User::class, 'inscriptions', 'classe_id', 'user_id');
     }
+
+
 }

@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ClasseController;
 use App\Http\Controllers\CoursController;
+use App\Http\Controllers\DemandeController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -23,8 +25,7 @@ Route::post('/user',[UserController::class,'store'])->name('store.user');
 Route::post('/import',[UserController::class,'import'])->name('import.user');
 
 Route::post('/login', [AuthController::class, 'login']);
-// Route::post('/logout', [AuthController::class, 'logout']);
-// Route::get('/user', [AuthController::class, 'user']);
+
 
 Route::post('/cours',[CoursController::class,'store'])->name('store.cours');
 Route::get('/cours',[CoursController::class,'index'])->name('index.cours');
@@ -37,6 +38,12 @@ Route::get('/session/prof/{profId}',[SessionController::class,'getSessionByProf'
 Route::get('/session/cancel/{id}',[SessionController::class,'cancelSession'])->name('cancelSession.session');
 Route::get('/session/validated/{id}',[SessionController::class,'validateSession'])->name('validateSession.session');
 Route::get('/session/invalidated/{id}',[SessionController::class,'invalidateSession'])->name('invalidateSession.session');
+
+Route::get('/demande',[DemandeController::class,'index'])->name('index.demande');
+Route::post('/demande',[DemandeController::class,'store'])->name('store.demande');
+
+Route::get('/classes',[ClasseController::class,'index'])->name('index.classes');
+
 
 
 Route::middleware('auth:sanctum')->group(function () {

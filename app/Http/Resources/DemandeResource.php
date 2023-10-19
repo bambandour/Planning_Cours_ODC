@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ClasseResource extends JsonResource
+class DemandeResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,10 +16,9 @@ class ClasseResource extends JsonResource
     {
         return [
             "id"=>$this->id,
-            "libelle"=>$this->libelle,
-            "filiere"=>$this->filiere,
-            // "effectif"=>$this->pivot->effectif,
-            "niveau"=>$this->level->libelle,
+            "motif"=>$this->motif,
+            "statut"=>$this->statut,
+            "session"=>SessionResource::make($this->session)
         ];
     }
 }
