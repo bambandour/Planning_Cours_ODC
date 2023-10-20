@@ -11,6 +11,7 @@ use App\Models\AnneeSemestre;
 use App\Models\Classe;
 use App\Models\Cours;
 use App\Models\Demande;
+use App\Models\Inscription;
 use App\Models\Module;
 use App\Models\Salle;
 use App\Models\Semestre;
@@ -154,8 +155,7 @@ class SessionController extends Controller
     public function getSessionByProf($profId) {
         $prof = User::where('id', $profId)->where('role', 'professeur')->first();
         if (!$prof) {
-            // return []; 
-        return $this->formatResponse('le prof n\'existe pas ! ' , [], true,201 );
+            return $this->formatResponse('le prof n\'existe pas ! ' , [], true,201 );
         }
         $userModule = UserModule::where('user_id', $prof->id)->first();
         if (!$userModule) {
@@ -171,6 +171,23 @@ class SessionController extends Controller
         }
         $data=SessionResource::collection($sessions);
         return $this->formatResponse('La liste des sessions de cours de Monsieur '.$prof->nom.' !', $data, false,200 );
+    }
+    public function getSessionsByUser($userId) {
+        $user = User::where('id', $userId)->first();
+        if (!$user) {
+            return $this->formatResponse('l\'etudiant n\'existe pas ! ' , [], true,201 );
+        }
+        $registration=Inscription::where('user_id', $user->id)->first();
+        $cours=Cours::where('annee_classe_id',$registration->annee_classe_id)->get();
+        $sessions = [];
+        foreach ($cours as $value) {
+            $session = Session::where('cours_id',$value->id)->first();
+            if ($session) {
+                $sessions[] = $session;
+            }
+        }
+        $data=SessionResource::collection($sessions);
+        return $this->formatResponse('La liste des sessions de cours de '.$user->prenom.' '.$user->nom.' !', $data, false,200 );
     }
 
     public function cancelSession($session_id){
