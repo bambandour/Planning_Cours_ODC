@@ -40,6 +40,62 @@ class SessionController extends Controller
         return $this->formatResponse('La liste des sessions de cours planifiés  !',$data, true, Response::HTTP_OK);
 
     }
+
+    public function getSessionsByRole($role,$user,){
+        $us=User::where('id',$user)->where('role',$role)->first();
+        if ($us->role==='RP') {
+            $session=Session::all();
+            $sal=Salle::all();
+            $salle=SalleResource::collection($sal);
+            $data=SessionResource::collection($session);
+            $sessions=[
+                "session"=>$data,
+                "salle"=>$salle
+            ];
+            return $this->formatResponse("Liste des sessions de cours planifiés", $sessions, true, Response::HTTP_OK);
+
+        }else {
+            if ($us->role==='attache'){
+                $session=Session::all();
+                $data=SessionResource::collection($session);
+                $sal=Salle::all();
+                $salle=SalleResource::collection($sal);
+                $sessions=[
+                    "session"=>$data,
+                    "salle"=>$salle
+                ];
+                return $this->formatResponse("Liste des sessions de cours planifiés", $sessions, true, Response::HTTP_OK);
+
+            }
+            else {
+                if ($us->role==='professeur') {
+                    $sal=Salle::all();
+                    $salle=SalleResource::collection($sal);
+                    $data=$this->getSessionByProf($us->id);
+                    $sessions=[
+                        "session"=>$data,
+                        "salle"=>$salle
+                    ];
+                    return $this->formatResponse("Liste des sessions de cours planifiés", $sessions, true, Response::HTTP_OK);
+
+                }else {
+                    if ($us->role==='etudiant') {
+                        $sal=Salle::all();
+                        $salle=SalleResource::collection($sal);
+                        $data=$this->getSessionsByUser($us->id);
+                        $sessions=[
+                            "session"=>$data,
+                            "salle"=>$salle
+                        ];
+                        return $this->formatResponse("Liste des sessions de cours planifiés", $sessions, true, Response::HTTP_OK);
+
+                    }
+                }
+            }
+        }
+        // return $sessions;
+
+    }
     public function store(Request $request){
 
         $cours=Cours::where('id',$request->cours)->first();
@@ -116,11 +172,7 @@ class SessionController extends Controller
         if ($cours->heure_restant <= 0) {
             return $this->formatResponse('L\'heure restante pour ce cours est épuisée.', null, true, 400);
         }
-        // $sess=Session::where('date_session',$request->date_session)->where('cours_id',$request->cours)->get();
-        // foreach ($sess as  $value) {
-        //     if ($request->cours) {        
-        //     }
-        // }
+        
         $sess=new Session;
         $sess->date_session = $request->date_session;
         $sess->h_debut = $request->heure_debut;
@@ -170,7 +222,7 @@ class SessionController extends Controller
             }
         }
         $data=SessionResource::collection($sessions);
-        return $this->formatResponse('La liste des sessions de cours de Monsieur '.$prof->nom.' !', $data, false,200 );
+        return  $data;
     }
     public function getSessionsByUser($userId) {
         $user = User::where('id', $userId)->first();
@@ -187,7 +239,7 @@ class SessionController extends Controller
             }
         }
         $data=SessionResource::collection($sessions);
-        return $this->formatResponse('La liste des sessions de cours de '.$user->prenom.' '.$user->nom.' !', $data, false,200 );
+        return $data;
     }
 
     public function cancelSession($session_id){
@@ -234,8 +286,6 @@ class SessionController extends Controller
         $session->save();
         return $this->formatResponse('La session de cours a été invalidée avec succès.', null, false, 200);
     }
-    public function sessionCanceledRequest(){
-
-    }
+    
 
 }

@@ -28,6 +28,33 @@ class CoursController extends Controller
         return $this->formatResponse('La liste des cours planifiés  !',$data, true, Response::HTTP_OK);
         // return $cours;
     }
+    public function getCoursByRole($role,$user){
+        $us=User::where('id',$user)->where('role',$role)->first();
+        if (!$us) {
+            return $this->formatResponse('L\'utilisateur n\'existe pas ! ' , [], true,201 );
+        }
+        if ($us->role=='RP') {
+            $cour=Cours::all();
+            $cours=CoursResource::collection($cour);
+            $cours=$this->formatResponse("Liste des cours planifiés", $cours, true, Response::HTTP_OK);
+        }else {
+            if ($us->role=='attache') {
+                $cour=Cours::all();
+                $cours=CoursResource::collection($cour);
+            }
+            else {
+                if ($us->role=='professeur') {
+                    $cours=$this->getCoursByProf($us->id);
+                }else {
+                    if ($us->role=='etudiant') {
+                        $cours=$this->getCoursByUser($us->id);
+                    }
+                }
+            }
+        }
+        // return $this->formatResponse("Liste des cours planifiés", $cours, true, Response::HTTP_OK);
+        return $cours;
+    }
 
     public function store(Request $request){
             $annee=AnneeSemestre::where('etat',1)->first();
