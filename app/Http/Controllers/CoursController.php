@@ -21,7 +21,6 @@ use Symfony\Component\HttpFoundation\Response;
 class CoursController extends Controller
 {
     use ResponseTrait;
-
     public function index(){
         $cours=Cours::all();
         $data=CoursResource::collection($cours);
@@ -63,7 +62,9 @@ class CoursController extends Controller
             "annee_semestre_id"=>$anneeSemestre->id,
             "user_module_id"=>$request->user_module_id,
             "annee_classe_id"=>$request->classe,
-            "heure_globale"=>$request->heure_globale
+            "heure_globale"=>$request->heure_globale,
+            "heure_restante"=>$request->heure_globale,
+            "heure_planifie"=>0,
         ]);
         
         $data=CoursResource::collection($cours);
@@ -86,6 +87,7 @@ class CoursController extends Controller
         $data=CoursResource::collection($cours);
         return $this->formatResponse('La liste des cours de '.$prof->grade.' '.$prof->nom.' !',$data, false, Response::HTTP_OK);
     }
+
     public function getCoursByUser($userId){
         if (!$userId) {
             return $this->formatResponse('L\'identifiant de l\'eleve n\'existe pas ! ' , [], true,201 );

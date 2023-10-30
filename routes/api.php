@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AbsenceController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClasseController;
 use App\Http\Controllers\CoursController;
@@ -42,13 +43,15 @@ Route::get('/eleve/{userId}/session',[SessionController::class,'getSessionsByUse
 Route::get('/session/cancel/{id}',[SessionController::class,'cancelSession'])->name('cancelSession.session');
 Route::get('/session/validated/{id}',[SessionController::class,'validateSession'])->name('validateSession.session');
 Route::get('/session/invalidated/{id}',[SessionController::class,'invalidateSession'])->name('invalidateSession.session');
+Route::put('/user/{id}/emargement',[SessionController::class,'emargement'])->name('emargement.session');
 
 Route::get('/demande',[DemandeController::class,'index'])->name('index.demande');
 Route::post('/demande',[DemandeController::class,'store'])->name('store.demande');
 
+Route::get('/absences',[AbsenceController::class,'index'])->name('index.demande');
+
+
 Route::get('/classes',[ClasseController::class,'index'])->name('index.classes');
-
-
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);

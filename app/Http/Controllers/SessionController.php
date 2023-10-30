@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\SessionRequest;
 use App\Http\Resources\SalleResource;
 use App\Http\Resources\SessionResource;
+use App\Http\Resources\UserResource;
+use App\Models\Absence;
 use App\Models\AnneeClasse;
 use App\Models\AnneeScolaire;
 use App\Models\AnneeSemestre;
@@ -53,7 +55,6 @@ class SessionController extends Controller
                 "salle"=>$salle
             ];
             return $this->formatResponse("Liste des sessions de cours planifiés", $sessions, true, Response::HTTP_OK);
-
         }else {
             if ($us->role==='attache'){
                 $session=Session::all();
@@ -65,7 +66,6 @@ class SessionController extends Controller
                     "salle"=>$salle
                 ];
                 return $this->formatResponse("Liste des sessions de cours planifiés", $sessions, true, Response::HTTP_OK);
-
             }
             else {
                 if ($us->role==='professeur') {
@@ -77,7 +77,6 @@ class SessionController extends Controller
                         "salle"=>$salle
                     ];
                     return $this->formatResponse("Liste des sessions de cours planifiés", $sessions, true, Response::HTTP_OK);
-
                 }else {
                     if ($us->role==='etudiant') {
                         $sal=Salle::all();
@@ -88,19 +87,16 @@ class SessionController extends Controller
                             "salle"=>$salle
                         ];
                         return $this->formatResponse("Liste des sessions de cours planifiés", $sessions, true, Response::HTTP_OK);
-
                     }
                 }
             }
         }
         // return $sessions;
-
     }
     public function store(Request $request){
-
         $cours=Cours::where('id',$request->cours)->first();
         $classeAnnee=Cours::where('annee_classe_id',$cours->annee_classe_id)->first();
-        $classe=AnneeClasse::where('classe_id',$classeAnnee->id)->first();
+        $classe=AnneeClasse::where('id',$classeAnnee->annee_classe_id)->where('etat',1)->first();
 
         if ($request->heure_debut >= $request->heure_fin) {
             return $this->formatResponse('L\'heure de début doit être inférieure à l\'heure de fin.', null, true, 400);
@@ -172,6 +168,9 @@ class SessionController extends Controller
         if ($cours->heure_restant <= 0) {
             return $this->formatResponse('L\'heure restante pour ce cours est épuisée.', null, true, 400);
         }
+        if($cours->heure_planifie===$cours->heure_globale){
+            return $this->formatResponse('L\'heure globale pour ce cours est épuisée.', null, true, 400);
+        }
         
         $sess=new Session;
         $sess->date_session = $request->date_session;
@@ -195,32 +194,37 @@ class SessionController extends Controller
         if ($sess->type === "presentiel") {
             $sess->salle_id = $request->salle;
             $salle = Salle::where('id', $request->salle)->first();
-            // if ($salle->nbre_places < $classe->effectif) {
-            //     return $this->formatResponse('Cette salle ne peut contenir l\'effectif de la classe.', null, true, 400);
-            // }
+            if ($salle->nbre_places < $classe->effectif) {
+                return $this->formatResponse('Cette salle ne peut contenir l\'effectif de la classe.', null, true, 400);
+            }
         }
         $sess->cours_id = $request->cours;
         $sess->save();
+        $course=Session::where('id',$sess->id)->first();
+        $classeOpen=Cours::where('id',$course->cours_id)->first();
+        $etudiants=Inscription::where('annee_classe_id',$classeOpen->annee_classe_id)->pluck('id');
+        foreach ($etudiants as  $etudiant) {
+            Absence::create([
+                'inscription_id'=> $etudiant,
+                'session_id'=>$sess->id,
+                'etat'=>false
+            ]);
+        }
+        $cours->heure_planifie+=$hours;
+        $cours->save();
         return $this->formatResponse('La séssion de cours a été planifiée avec succés !', $sess, false,200 );
     }
-
     public function getSessionByProf($profId) {
         $prof = User::where('id', $profId)->where('role', 'professeur')->first();
         if (!$prof) {
-            return $this->formatResponse('le prof n\'existe pas ! ' , [], true,201 );
+            return $this->formatResponse('le prof n\'existe pas ! ' , [], true,201 ); 
         }
-        $userModule = UserModule::where('user_id', $prof->id)->first();
-        if (!$userModule) {
+        $userModules = UserModule::where('user_id', $prof->id)->get();
+        if ($userModules->isEmpty()) {
             return $this->formatResponse('le module associé au professeur n\'existe pas ! ' , [], true,201 );
         }
-        $cours = Cours::where('user_module_id', $userModule->id)->get();
-        $sessions = [];
-        foreach ($cours as $value) {
-            $session = Session::where('cours_id', $value->id)->first();
-            if ($session) {
-                $sessions[] = $session;
-            }
-        }
+        $cours=Cours::whereIn('user_module_id', $userModules->pluck('id'))->get();
+        $sessions =Session::whereIn('cours_id', $cours->pluck('id'))->get();
         $data=SessionResource::collection($sessions);
         return  $data;
     }
@@ -241,7 +245,6 @@ class SessionController extends Controller
         $data=SessionResource::collection($sessions);
         return $data;
     }
-
     public function cancelSession($session_id){
         $session = Session::where('etat',0)->find($session_id);
         if (!$session) {
@@ -258,7 +261,6 @@ class SessionController extends Controller
         $session->delete();
         return $this->formatResponse('La session de cours a été annulée avec succès.', null, false, 200);
     }
-
     public function validateSession($session_id) {
         $session = Session::find($session_id);
         if (!$session) {
@@ -266,6 +268,8 @@ class SessionController extends Controller
         }
         $currentDateTime = now();
         $sessionEndDateTime = Carbon::parse($session->date_session . ' ' . $session->h_fin);
+        $absence =Absence::where('session_id',$session)->first();
+        
         if ($currentDateTime > $sessionEndDateTime) {
             $cours = Cours::find($session->cours_id);
             $cours->heure_restant -= $session->nombre_heure;
@@ -285,6 +289,17 @@ class SessionController extends Controller
         $session->etat = false;
         $session->save();
         return $this->formatResponse('La session de cours a été invalidée avec succès.', null, false, 200);
+    }
+    public function emargement(Request $request, $user_id) {
+        $eleve=Inscription::where('user_id',$user_id)->first();
+        $session=Session::where('id', $request->session)->first();
+        $absence=Absence::where('inscription_id',$eleve->id)
+                            ->where('session_id',$session->id)->first();
+        $absence->update([
+            'etat'=>true
+        ]);
+        return $this->formatResponse('Votre émargement a été pris en compte !', UserResource::make($absence), false, 200);
+        
     }
     
 

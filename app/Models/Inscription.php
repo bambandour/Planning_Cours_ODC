@@ -10,4 +10,8 @@ class Inscription extends Model
 {
     use HasFactory, Notifiable;
     public $guarded=[''];
+    
+    public function user(){
+        return $this->belongsTo(User::class);
+    }
 }

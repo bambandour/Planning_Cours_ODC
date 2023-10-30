@@ -40,7 +40,7 @@ class UserController extends Controller
         ]);
         $file = $request->file('file');
         Excel::import(new UsersImport, $file);
-        return response("L'inscription a été faite avec succes !!!",200,[$file]);
+        return response(["message"=>"L'inscription a été faite avec succes !!!", "statusCode"=>201,"data" =>[$file]]);
     }
     
 }
