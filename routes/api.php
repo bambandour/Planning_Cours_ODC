@@ -43,12 +43,13 @@ Route::get('/eleve/{userId}/session',[SessionController::class,'getSessionsByUse
 Route::get('/session/cancel/{id}',[SessionController::class,'cancelSession'])->name('cancelSession.session');
 Route::get('/session/validated/{id}',[SessionController::class,'validateSession'])->name('validateSession.session');
 Route::get('/session/invalidated/{id}',[SessionController::class,'invalidateSession'])->name('invalidateSession.session');
-Route::put('/user/{id}/emargement',[SessionController::class,'emargement'])->name('emargement.session');
+Route::put('/user/{user_id}/emargement',[SessionController::class,'emargement'])->name('emargement.session');
 
 Route::get('/demande',[DemandeController::class,'index'])->name('index.demande');
 Route::post('/demande',[DemandeController::class,'store'])->name('store.demande');
 
 Route::get('/absences',[AbsenceController::class,'index'])->name('index.demande');
+Route::get('/session/{session}/emargement',[AbsenceController::class,'getEmargementsBySession'])->name('getEmargementsBySession');
 
 
 Route::get('/classes',[ClasseController::class,'index'])->name('index.classes');

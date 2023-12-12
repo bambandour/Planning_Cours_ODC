@@ -211,6 +211,7 @@ class SessionController extends Controller
             ]);
         }
         $cours->heure_planifie+=$hours;
+        $cours->heure_restant-=$hours;
         $cours->save();
         return $this->formatResponse('La séssion de cours a été planifiée avec succés !', $sess, false,200 );
     }
@@ -286,6 +287,14 @@ class SessionController extends Controller
         if (!$session) {
             return $this->formatResponse('La session de cours n\'existe pas.', null, true, 404);
         }
+        $emargement=Absence::where('session_id',$session_id)->get();
+        foreach ($emargement as  $emarg) {
+            if ($emarg->etat == true) {
+                return $this->formatResponse('La session de cours ne peut etre invalidée !', null, true, 404);
+            }
+        }
+        $currentDateTime = now();
+        $sessionEndDateTime = Carbon::parse($session->date_session . ' ' . $session->h_fin);
         $session->etat = false;
         $session->save();
         return $this->formatResponse('La session de cours a été invalidée avec succès.', null, false, 200);
@@ -295,12 +304,7 @@ class SessionController extends Controller
         $session=Session::where('id', $request->session)->first();
         $absence=Absence::where('inscription_id',$eleve->id)
                             ->where('session_id',$session->id)->first();
-        $absence->update([
-            'etat'=>true
-        ]);
-        return $this->formatResponse('Votre émargement a été pris en compte !', UserResource::make($absence), false, 200);
-        
+        Absence::find($absence->id)->update(['etat'=> true]);
+        return $this->formatResponse('Votre émargement a été pris en compte !', null, false, 200);
     }
-    
-
 }

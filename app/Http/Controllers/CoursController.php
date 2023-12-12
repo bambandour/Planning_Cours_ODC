@@ -58,14 +58,17 @@ class CoursController extends Controller
     public function store(Request $request){
             $annee=AnneeSemestre::where('etat',1)->first();
             $anneeSemestre=AnneeSemestre::where('annee_scolaire_id',$annee->id)->where('etat',1)->first();
-            $cours=Cours::create([
-            "annee_semestre_id"=>$anneeSemestre->id,
-            "user_module_id"=>$request->user_module_id,
-            "annee_classe_id"=>$request->classe,
-            "heure_globale"=>$request->heure_globale,
-            "heure_restante"=>$request->heure_globale,
-            "heure_planifie"=>0,
-        ]);
+            $cours=new Cours();
+            $cours->annee_semestre_id=$anneeSemestre->id;
+            // $cours->annee
+        //     $cours=Cours::create([
+        //     "annee_semestre_id"=>$anneeSemestre->id,
+        //     "user_module_id"=>$request->user_module_id,
+        //     "annee_classe_id"=>$request->classe,
+        //     "heure_globale"=>$request->heure_globale,
+        //     "heure_restante"=>$request->heure_globale,
+        //     "heure_planifie"=>0,
+        // ]);
         
         $data=CoursResource::collection($cours);
         return $this->formatResponse('Le cours a été planifié avec succés !',$data, true, Response::HTTP_CREATED,);

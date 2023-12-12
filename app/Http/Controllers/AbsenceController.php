@@ -13,6 +13,10 @@ class AbsenceController extends Controller
         $absence = Absence::all();
         $data=AbsenceResource::collection($absence);
         return $this->formatResponse('La liste des émargements !', $data, false, 201);
+    }
+    public function getEmargementsBySession($session){
+        $absence = Absence::where('session_id', $session)->get();
+        dd($absence);
         
     }
 }
